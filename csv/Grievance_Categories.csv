@@ -1,0 +1,10 @@
+Parent_Disposition_Code,Sub_Category_Code,Sub_Category_Label,Description_Hindi
+GRIEVANCE,LOAN_NOT_TAKEN,Loan Not Taken,ग्राहक कहता है कि उसने Capri Global से यह loan/EMI लिया ही नहीं; high-priority fraud/identity check।
+GRIEVANCE,LOAN_CANCELLED,Loan Cancelled,ग्राहक के अनुसार loan पहले ही cancel/closed हो चुका है लेकिन EMI या demand अभी भी दिख रही है।
+GRIEVANCE,LOAN_AMOUNT_NOT_RECEIVED,Loan amount not received,ग्राहक कहता है कि loan disbursal approve दिख रहा है पर राशि खाते में credit नहीं हुई या पूरी नहीं मिली।
+GRIEVANCE,AUTO_DEBIT_NOT_HAPPENING,Auto debit is not happening,ग्राहक की शिकायत है कि ECS / NACH / auto-debit mandate active होने के बावजूद EMI auto-debit नहीं हो रही।
+GRIEVANCE,PAYMENT_DONE_NOT_UPDATED,Payment done but not updated,ग्राहक के अनुसार उसने EMI का भुगतान कर दिया है लेकिन system में अभी भी बकाया दिख रहा है या reminder जा रहे हैं।
+GRIEVANCE,WRONG_EMI_AMOUNT,EMI amount / charges dispute,"ग्राहक EMI राशि, ब्याज दर, late charge या bounce charge को गलत / अधिक बताता है और स्पष्टीकरण या सुधार चाहता है।"
+GRIEVANCE,REPAYMENT_PLAN_QUERY,Repayment plan / restructuring query,"ग्राहक EMI tenure, restructuring, moratorium या repayment schedule में बदलाव को लेकर query या अनुरोध करता है।"
+GRIEVANCE,SERVICE_BEHAVIOUR_COMPLAINT,Service / behaviour complaint,"ग्राहक collection calls, व्यवहार, या किसी शाखा/स्टाफ से असंतुष्ट है और formal complaint दर्ज कराना चाहता है।"
+GRIEVANCE,OTHER_GRIEVANCE,Other grievance,कोई अन्य complaint जो ऊपर की किसी category में नहीं आती; agent को free-text नोट्स भरने होंगे।

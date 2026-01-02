@@ -1,0 +1,129 @@
+.transcript-form {
+  margin-bottom: 40px;
+}
+
+.form-section {
+  margin-bottom: 30px;
+}
+
+.section-label {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin-bottom: 10px;
+}
+
+.label-icon {
+  font-size: 1.3rem;
+}
+
+.label-text {
+  color: #e0e0e0;
+  font-size: 1.1rem;
+  font-weight: 600;
+}
+
+.section-description {
+  color: #a0a0a0;
+  font-size: 0.9rem;
+  margin-bottom: 15px;
+  line-height: 1.5;
+}
+
+.section-description code {
+  color: #00d4ff;
+  background: rgba(0, 212, 255, 0.1);
+  padding: 2px 6px;
+  border-radius: 4px;
+}
+
+.transcript-input {
+  width: 100%;
+  padding: 20px;
+  background: #1a1f3a;
+  border: 2px dashed #2d3555;
+  border-radius: 12px;
+  font-size: 0.95rem;
+  font-family: 'Courier New', monospace;
+  color: #e0e0e0;
+  resize: vertical;
+  transition: all 0.3s ease;
+  min-height: 300px;
+  line-height: 1.6;
+}
+
+.transcript-input:focus {
+  outline: none;
+  border-color: #00d4ff;
+  background: #1f2540;
+  box-shadow: 0 0 0 3px rgba(0, 212, 255, 0.1);
+}
+
+.transcript-input:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+.transcript-input::placeholder {
+  color: #5a5f7a;
+  font-style: italic;
+}
+
+.json-error {
+  margin-top: 10px;
+  padding: 12px 16px;
+  background: rgba(255, 68, 68, 0.1);
+  border: 1px solid rgba(255, 68, 68, 0.3);
+  border-radius: 8px;
+  color: #ff6b6b;
+  font-size: 0.9rem;
+}
+
+.submit-btn {
+  width: 100%;
+  padding: 18px 32px;
+  background: linear-gradient(135deg, #00d4ff 0%, #0066cc 100%);
+  color: white;
+  border: none;
+  border-radius: 12px;
+  font-size: 1.1rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  box-shadow: 0 4px 20px rgba(0, 212, 255, 0.3);
+}
+
+.submit-btn:hover:not(:disabled) {
+  transform: translateY(-2px);
+  box-shadow: 0 6px 25px rgba(0, 212, 255, 0.4);
+}
+
+.submit-btn:active:not(:disabled) {
+  transform: translateY(0);
+}
+
+.submit-btn:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+  transform: none;
+}
+
+.btn-icon {
+  font-size: 1.2rem;
+}
+
+@media (max-width: 768px) {
+  .transcript-input {
+    min-height: 250px;
+    font-size: 0.9rem;
+  }
+
+  .submit-btn {
+    padding: 16px 24px;
+    font-size: 1rem;
+  }
+}

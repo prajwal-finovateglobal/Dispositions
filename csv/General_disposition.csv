@@ -1,0 +1,27 @@
+Connected_Status,Disposition_Code,Disposition_Label,Description_Hindi,Requires_Sub_Category
+Connected,ANSWERED_BY_FAMILY_MEMBER,Family / Third Person on Call,"Call connected, but instead of the customer, a family member or third person answered; customer unavailable, asked to call later.",No
+Connected,ANSWERED_DISCONNECTED,Call Disconnected Immediately,"Call connected but got disconnected instantly, and no meaningful conversation happened (customer disconnected / network drop).",No
+Connected,ANSWERED_LANDED_ON_VOICEMAIL,Voicemail / Answering Machine,The call went to voicemail or an answering machine; the bot/agent left a generic EMI reminder message.,No
+Connected,WRONG_NUMBER,Wrong Number / Customer Not Found,The person on the number clearly stated that this is not the customer’s number or they do not know the customer.,No
+Connected,CUSTOMER_EXPIRED,Customer Deceased,A family member or third person informed that the customer has passed away.,No
+Connected,GRIEVANCE,Complaint / Dispute (Grievance),"During the call, the customer raised a complaint or dispute related to loan/EMI/charges/process (e.g., loan not taken, auto-debit issue, etc.).",Yes
+Connected,DENIED_TO_PAY,Refusal to Pay,The correct customer is on the line and clearly states that they will not pay the EMI or outstanding amount.,No
+Connected,FUNDS_CONFIRMED_BEFORE_5TH,Funds Confirmed Before 5th,Customer confirms that sufficient balance will be available before the 5th for EMI (client-specific use-case).,No
+Connected,FUNDS_CONFIRMED_BEFORE_10TH,Funds Confirmed Before 10th,Customer confirms that sufficient balance will be available before the 10th for EMI (client-specific use-case).,No
+Connected,PTP_ON_DUE_DATE,Promise to Pay – On Due Date,Customer says the full EMI amount will be available by the due date or same day and auto-debit will be successful (YES-path or NO → YES).,No
+Connected,PTP_ON_SPECIFIC_DATE,Promise to Pay – Specific Date,Customer promises to deposit the amount by a specific date (due date or any agreed date); PTP date is logged.,No
+Connected,ALREADY_PAID_PROOF_PENDING,Already Paid – Proof Pending,Customer says EMI is already paid but receipt/screenshot or proof has not yet been shared; secure link sent.,No
+Connected,ALREADY_PAID_PROOF_RECEIVED,Already Paid – Proof Received,Payment proof (receipt/screenshot) sent by the customer has been successfully received/uploaded and forwarded for verification.,No
+Connected,UNABLE_TO_PAY_SALARY_DELAY,Payment Difficulty – Salary Delay,Customer is willing but cannot pay the EMI now due to salary delay; requires escalation/follow-up.,No
+Connected,UNABLE_TO_PAY_JOB_LOSS,Payment Difficulty – Lost Job,"Customer lost their job or income has stopped, so they are unable to pay EMI; for hardship/restructuring evaluation.",No
+Connected,UNABLE_TO_PAY_MEDICAL,Payment Difficulty – Medical / Health Reason,"Customer or family member has a serious medical condition, making payment temporarily difficult; high-empathy escalation as per script.",No
+Connected,UNABLE_TO_PAY_TECH_ISSUE,Payment Difficulty – Technical Issue,Customer wants to pay but cannot due to UPI/net-banking/app/bank technical issues.,No
+Connected,UNABLE_TO_PAY_OTHER,Payment Difficulty – Other Reason,"Customer intends to pay but faces difficulty in this EMI due to other reasons (travel, family issues, etc.).",No
+Connected,CALLBACK_REQUESTED,Customer Requested Call Back Later,Correct customer is on the line but cannot talk right now; clearly requests a callback at another time or slot.,No
+Connected,DO_NOT_DISTURB_REQUESTED,DND / Do Not Call Request,Customer clearly states that they do not want further calls or promotional communication regarding this loan/EMI (DND / consent withdrawal).,No
+Not Connected,BUSY (RINGING_DISCONNECTED),BUSY (Disconnected While Ringing),Call attempt shows busy tone or gets disconnected during ringing; no conversation happened.,No
+Not Connected,NO_ANSWER (RINGING_NOT_ANSWERED),NO ANSWER (Call Not Picked),Phone kept ringing but no one answered; no interaction.,No
+Not Connected,SWITCHED_OFF,Mobile Switched Off / Not Reachable,Telecom message states that the number is switched off or not reachable; call did not connect.,No
+Not Connected,OUT_OF_COVERAGE,Out of Network Coverage,Telecom message indicates the number is out of network coverage; needs retry later.,No
+Not Connected,INVALID_NUMBER_FORMAT,Invalid Number / Wrong Format,Dialed mobile number is invalid or not in service; technical correction/data cleanup required.,No
+Not Connected,NETWORK_ERROR_RETRY,Network / Technical Error – Retry,"Call could not be completed due to network/system errors (signalling failure, etc.); auto-retry can be attempted later.",No
