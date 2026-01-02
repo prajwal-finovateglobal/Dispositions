@@ -41,7 +41,7 @@ function App() {
     <div className="app">
       <div className="container">
         <header className="header">
-          <h1>Call Center Disposition Classifier</h1>
+          <h1>Disposition Classifier</h1>
           <p>Classify loan collection call transcripts with AI</p>
         </header>
 

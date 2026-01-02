@@ -10,6 +10,7 @@ Connected,FUNDS_CONFIRMED_BEFORE_5TH,Funds Confirmed Before 5th,Customer confirm
 Connected,FUNDS_CONFIRMED_BEFORE_10TH,Funds Confirmed Before 10th,Customer confirms that sufficient balance will be available before the 10th for EMI (client-specific use-case).,No
 Connected,PTP_ON_DUE_DATE,Promise to Pay – On Due Date,Customer says the full EMI amount will be available by the due date or same day and auto-debit will be successful (YES-path or NO → YES).,No
 Connected,PTP_ON_SPECIFIC_DATE,Promise to Pay – Specific Date,Customer promises to deposit the amount by a specific date (due date or any agreed date); PTP date is logged.,No
+Connected,PTP_SOFT_PROMISE,Promise to Pay – Soft / Tentative,Customer verbally indicates intent to pay (e.g: I’ll try  or  maybe tomorrow) without confirming a firm date or amount.,No
 Connected,ALREADY_PAID_PROOF_PENDING,Already Paid – Proof Pending,Customer says EMI is already paid but receipt/screenshot or proof has not yet been shared; secure link sent.,No
 Connected,ALREADY_PAID_PROOF_RECEIVED,Already Paid – Proof Received,Payment proof (receipt/screenshot) sent by the customer has been successfully received/uploaded and forwarded for verification.,No
 Connected,UNABLE_TO_PAY_SALARY_DELAY,Payment Difficulty – Salary Delay,Customer is willing but cannot pay the EMI now due to salary delay; requires escalation/follow-up.,No

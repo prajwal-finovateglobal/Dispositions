@@ -51,6 +51,9 @@ INPUTS YOU WILL RECEIVE:
 2. DISPOSITION TABLE divided into:
    - CONNECTED DISPOSITIONS
    - NOT CONNECTED DISPOSITIONS
+   
+This is a RAW CALL TRANSCRIPT between a loan collections agent (lender) and a customer (borrower). The conversation represents a real interaction in the context of loan repayment or follow-up on overdue payments.
+
 
 CONNECTION STATUS GROUPS:
 CONNECTED DISPOSITIONS: {disposition_data_formated.split('Not Connected')[0]}
@@ -93,6 +96,8 @@ i. confidence score (clarity/confusion-based):
     c. If transcript gives VAGUE or UNCERTAIN clues and you must GUESS among several possible dispositions, use a LOW confidence score within the range of 0.50 to 0.00(e.g., 0.30, 0.20, 0.10 -- the more vague or uncertain, the closer to 0.50).
     d. Confidence should ALWAYS reflect how SURE you are that the evidence matches ONLY the chosen disposition (high = sure, low = confused/uncertain)
     e. ALWAYS explain your rating of confidence in your "explanation" field by describing why you were sure or what caused any confusion/uncertainty.
+    f. Do NOT restrict confidence scores to round numbers only. Return the most accurate confidence value based on your assessment (e.g., 0.88, 0.94, 0.96, 0.13, etc.) if appropriate. Use any decimal value between 0 and 1 as needed to reflect the true certainty level.
+
 ---------------------------------------------
 ii. explanation:
 Describe, in detail, the reasoning behind the chosen disposition and confidence score. Specifically:
@@ -103,15 +108,19 @@ Describe, in detail, the reasoning behind the chosen disposition and confidence 
     - Describe the specific point(s) in the transcript that were confusing or could be interpreted in multiple ways.
     - State why, despite possible confusion, the selected disposition was chosen over others.
 - Always make the explanation transparent, so that anyone reading it understands exactly why the confidence is rated as it is, and what evidence supported or limited your certainty.
+- When constructing the explanation for the disposition, include not only the reasons that support the confidence rating, but also, if the confidence is less than 1.0, explicitly state what accounts for the "unconfident" portion (e.g., for confidence = 0.88, explain both why you are 0.88 sure and what causes the remaining 0.12 uncertainty/confusion). The explanation should have a sentence or clause such as: "Confidence is 0.88 because XYZ concrete evidence supports this disposition, but there is a 0.12 uncertainty due to [specific ambiguity, missing detail, overlap with another possible disposition, or confusing part in the transcript]." This should always be made explicit.
+
 ---------------------------------------------
 iii. key points: First, clearly list the main key points you have understood from the transcript before making any classification or decision. These should be concise statements capturing the most important details, facts, or events in the transcript that will inform your disposition choice. Only after identifying and listing these key points should you proceed to assign the disposition and fill out the remaining fields.
 ---------------------------------------------
+
 ## CLASSIFY NOW:
 "Disposition_code": "EXACT_CODE_FROM_TABLE"
 "confidence": "confidence score of the disposition"
 "explanation": "explanation of the disposition"
 "summary": None
 "key_points": "key points of the transcript"
+
 """
 
 # Disposition classifier agent is a agent that classifies the disposition of the transcript
