@@ -151,7 +151,7 @@ Create a `.env` file in the root directory with:
 
 ```env
 OPENAI_API_KEY=your_api_key_here
-OPENAI_MODEL=gpt-4
+OPENAI_MODEL=gpt-4-mini
 ```
 
 
