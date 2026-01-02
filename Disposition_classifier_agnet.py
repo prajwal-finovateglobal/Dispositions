@@ -51,7 +51,7 @@ INPUTS YOU WILL RECEIVE:
 2. DISPOSITION TABLE divided into:
    - CONNECTED DISPOSITIONS
    - NOT CONNECTED DISPOSITIONS
-   
+
 This is a RAW CALL TRANSCRIPT between a loan collections agent (lender) and a customer (borrower). The conversation represents a real interaction in the context of loan repayment or follow-up on overdue payments.
 
 
@@ -127,11 +127,11 @@ iii. key points: First, clearly list the main key points you have understood fro
 @router.post("/disposition")
 async def get_disposition(transcript: List[Dict[str, Any]]) -> DispositionResult:
 
-    user_turns = len([msg for msg in transcript if msg['role'] == 'user'])
+    # user_turns = len([msg for msg in transcript if msg['role'] == 'user'])
     
     # **RULE #1**: Ultra-short connected calls = DISCONNECTED
-    if user_turns <= 2:  
-        return DispositionResult(Disposition_code="ANSWERED DISCONNECTED", confidence=-1.0, explanation="Less than 2 borrower turns", summary="", key_points=[])
+    # if user_turns <= 2:  
+    #     return DispositionResult(Disposition_code="ANSWERED DISCONNECTED", confidence=-1.0, explanation="Less than 2 borrower turns", summary="", key_points=[])
 
     connection_status = detect_connection_status(transcript)
     summary = get_summary(transcript)
