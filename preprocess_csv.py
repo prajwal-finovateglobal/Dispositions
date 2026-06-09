@@ -2,19 +2,19 @@ import pandas as pd
 
 # Disposition data is a list of dispositions
 disposition_data = []
-df = pd.read_csv("csv/General_disposition.csv")
+df = pd.read_csv("csv/dispositions.csv")
 for row in df.itertuples(index=False, name=None):
     data = {
-        "connected_status": row[0],
-        "disposition_code": row[1],
-        "disposition_label": row[2],
-        "disposition_description": row[3]
+        "Category": row[0],
+        "Priority": row[1],
+        "Disposition Code": row[2],
+        "Description": row[3]
     }
     disposition_data.append(data)
 
 # Disposition data formatted is a formatted string of the disposition data
 disposition_data_formated = "\n".join([
-    f"{i+1}. CODE: {x['disposition_code']} | STATUS: {x['connected_status']} | LABEL: {x['disposition_label']} | DESC: {x['disposition_description']}"
+    f"{i+1}. CATEGORY: {x['Category']} | PRIORITY: {x['Priority']} | CODE: {x['Disposition Code']} | DESCRIPTION: {x['Description']}"
     for i, x in enumerate(disposition_data)
 ])
 

@@ -1,0 +1,26 @@
+Category,Priority,Disposition Code,Description
+CUSTOMER DECEASED,1,CUSTOMER EXPIRED,Customer is reported deceased. Informed by the receiver.
+PTP,1,PTP ON SPECIFIC DATE,Payment Commitment on a specific date. Follow-up scheduled after the promised date.
+ALREADY PAID,1,ALREADY PAID,Customer stated that the payment has already been made. Payment status to be verified.
+PTP,1,PTP SOFT PROMISE,Indicated willingness to make the payment but no commitment to a specific date. Follow-up scheduled.
+GREVIENCE,2,GREVIENCE (LOAN NOT TAKEN),Customer stated that the loan associated with the account does not belong to them. Ownership disputed. The case to be reviewed further.
+GREVIENCE,2,GREVIENCE (LOAN CANCELLED),Customer raised a grievance stating that the loan was cancelled and no active loan should exist against their account. Customer disputes the outstanding status and has requested verification. The case is to be reviewed.
+GREVIENCE,2,GREVIENCE (LOAN AMOUNT NOT RECEIVED),Customer raised a grievance stating that the loan amount has not been received or credited to their account. Case is to be reviewed before further action.
+GREVIENCE,2,GREVIENCE (AUTO DEBIT NOT HAPPENING),Customer raised a grievance stating that the auto-debit mandate is not being executed and payments are not getting debited as scheduled. Case is to be reviewe before further action.
+GREVIENCE,2,GREVIENCE (PAYMENT DONE NOT UPDATED),"Customer raised a grievance stating that the payment has been completed, either through cash collection by a field agent or via another payment mode, but the same is not reflected in the system records. The case is to be reviewed before further action."
+GREVIENCE,2,GREVIENCE (WRONG EMI AMOUNT),Customer raised a grievance stating that the EMI amount is incorrect. The case is to be reviewed before further action.
+GREVIENCE,2,GREVIENCE (REPAYMENT PLAN QUERY),Customer raised a grievance regarding the loan repayment plan. The case is to be reviewed before further action.
+GREVIENCE,2,GREVIENCE (SERVICE BEHAVIOUR COMPLAINT),"Customer raised a grievance regarding the conduct, behaviour, or communication of a service representative or field agent during an interaction. The case is to be reviewed before further action."
+GREVIENCE,2,GREVIENCE (OTHER GRIEVANCE),Customer raised a grievance related to the account or service that does not fall under any predefined grievance categories. Customer has reported an issue and requested review. The case is to be examined and resolved as per grievance handling policy.
+ANSWERED - NO OUTCOMES,3,ANSWERED BY FAMILY MEMBER,Call was answered by a family member of the customer. Customer was not available during the call. Information was shared by the family member as applicable.
+ANSWERED - NO OUTCOMES,3,ANSWERED DISCONNECTED,"Call was answered; however, the call was disconnected or ended before any meaningful two-way communication could take place. No customer intent, request, or actionable information was obtained. Callback is not explicitly requested and no continuation of the conversation was possible.A Follow up call will be scheduled."
+ANSWERED - NO OUTCOMES,3,ANSWERED LANDED ON VOICEMAIL,Call was answered by an automated voicemail or answering system and not by the customer or a third party. No live interaction occurred.
+WRONG NUMBER,3,WRONG NUMBER,Call was connected to a person who confirmed that the dialed number does not belong to the intended customer.
+DENIED TO PAY,3,DENIED TO PAY,Call was connected to a person who confirmed that there is no intent for payment from customer's end. Probing questions did not change the call's outcome.
+UNABLE TO PAY,3,UNABLE TO PAY SALARY DELAY,"Customer was contacted and clearly stated unwillingness or refusal to make the payment at this time due to salary issues.Further follow up call to be scheduled."
+UNABLE TO PAY,3,UNABLE TO PAY JOB LOSS,"Customer was contacted and stated inability to make the payment due to loss of employment or source of income. Follow-up call to be scheduled."
+UNABLE TO PAY,3,UNABLE TO PAY MEDICAL,"Customer was contacted and stated inability to make the payment due to medical reasons or health-related expenses. Follow-up call to be scheduled."
+UNABLE TO PAY,3,UNABLE TO PAY OTHER,"Customer was contacted and stated inability to make the payment. Follow-up call to be scheduled."
+CALL BACK,3,CALLBACK REQUESTED,"Customer or contact requested a callback.No meaningful discussion or payment commitment was concluded during the call. Callback is required."
+DO NOT DISTURB,3,DO NOT DISTURB REQUESTED,Customer explicitly requested that no further calls be made to the number.
+DIFFERENT CUSTOMER LANGUAGE,4,INCORRECT LANGUAGE,"Call was connected; however, meaningful communication could not be established due to a language mismatch between the agent and the customer. No valid information, intent, or request could be obtained during the call."

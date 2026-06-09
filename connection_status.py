@@ -10,7 +10,7 @@ from typing import List, Dict, Any
 import loguru
 
 # Connection status agent is a agent that detects the connection status of the transcript
-def detect_connection_status(transcript: List[Dict[str, Any]]) -> str:
+async def detect_connection_status(transcript: List[Dict[str, Any]]) -> str:
     """First pass: Detect if call was CONNECTED using raw transcript patterns"""
     transcript_text = preprocess_transcript(transcript).lower()
     
@@ -38,7 +38,7 @@ def detect_connection_status(transcript: List[Dict[str, Any]]) -> str:
     Respond ONLY: "CONNECTED" or "NOT CONNECTED"
     """
     
-    result = status_model.invoke([{"role": "system", "content": status_prompt.format(transcript=transcript_text)}])
+    result = await status_model.ainvoke([{"role": "system", "content": status_prompt.format(transcript=transcript_text)}])
     res = result.content.strip()
     loguru.logger.info(f"Connection Status: {res}")
     return res

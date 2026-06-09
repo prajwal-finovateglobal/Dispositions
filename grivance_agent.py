@@ -88,9 +88,9 @@ GRIEVANCE SUBCATEGORY TABLE (Ground Truth)
 """
 
 # Grievance agent is a agent that classifies the grievance of the transcript
-def get_grievance(summary: str) -> str:
+async def get_grievance(summary: str) -> str:
     # Grievance agent is a agent that classifies the grievance of the transcript
-        result_grievance = agent.invoke({
+        result_grievance = await agent.ainvoke({
     "messages": [
         {"role": "system", "content": system_prompt_grievance},
         {

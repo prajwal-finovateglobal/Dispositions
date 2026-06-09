@@ -11,8 +11,19 @@ from T2T_agent import preprocess_transcript
 from typing import List, Dict, Any
 
 # Summary agent is a agent that summarizes the transcript into a text to text format
-model = ChatOpenAI(model=os.getenv("OPENAI_MODEL"), temperature=0.2)
-
+# model = ChatOpenAI(model=os.getenv("OPENAI_MODEL"), temperature=0.7)
+model = ChatOpenAI(
+    base_url=f"http://{os.getenv('IP_ADDRESS')}:8000/v1",
+    api_key="not-needed",
+    model="openai/gpt-oss-20b",
+    temperature=0.7,
+)
+# model = ChatOpenAI(
+#     base_url="https://api.euron.one/api/v1/euri",
+#     api_key=os.getenv("EURON_API_KEY"),
+#     model="openai/gpt-oss-20b",
+#     temperature=0.7,
+# )
 # Summary agent is a agent that summarizes the transcript into a text to text format
 summary_agent = create_agent(
     model=model,
@@ -51,11 +62,13 @@ Output PLAIN TEXT SUMMARY ONLY. No bullets. No markdown.
 """
 
 # Summary agent is a agent that summarizes the transcript into a text to text format
-def get_summary(transcript: List[Dict[str, Any]]):
-    transcript_string = preprocess_transcript(transcript)
-    result = summary_agent.invoke({"messages": [
+async def get_summary(transcript: List[Dict[str, Any]]):
+    # transcript_string = preprocess_transcript(transcript)
+    transcript_string = str(transcript)
+    result = await summary_agent.ainvoke({"messages": [
         {"role": "system", "content": system_prompt},
         {"role": "user", "content": transcript_string}]})
     res = result['messages'][-1].content
-    return res
+    tokens = result['messages'][-1].usage_metadata['total_tokens']
+    return {"summary": res, "tokens": tokens}
 
