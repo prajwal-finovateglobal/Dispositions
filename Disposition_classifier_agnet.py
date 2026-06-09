@@ -5,15 +5,16 @@ import re
 from dotenv import load_dotenv
 load_dotenv()
 os.environ["OPENAI_API_KEY"] = os.getenv("OPENAI_API_KEY")
-from fastapi import APIRouter, HTTPException
+from fastapi import APIRouter, Body, HTTPException
 from summary_agent import get_summary
 from typing import List, Dict, Any, Optional
-from pydantic import BaseModel, Field
+from pydantic import BaseModel, Field, ValidationError
 import loguru
 from langchain_openai import ChatOpenAI
 from langchain_core.messages import AIMessage, HumanMessage, SystemMessage, ToolMessage
 import pandas as pd
 from openai import LengthFinishReasonError
+from transcript_utils import normalize_transcript
 
 # Disposition classifier agent is a agent that classifies the disposition of the transcript
 router = APIRouter()
@@ -80,26 +81,16 @@ disposition_llm = model.with_structured_output(DispositionResult, include_raw=Tr
 DEFAULT_DISPOSITION = "CONTACT ESTABLISHED NO OUTCOME"
 SHORT_CALL_DISPOSITION = "ANSWERED DISCONNECTED"
 
-VALID_DISPOSITION_CODES = frozenset(
-    {
-        "ANSWERED BY FAMILY MEMBER",
-        "WRONG NUMBER",
-        "CALLBACK REQUESTED",
-        "ANSWERED DISCONNECTED",
-        "ANSWERED LANDED ON VOICEMAIL",
-        "INCORRECT LANGUAGE",
-        "GRIEVANCE (LOAN AMOUNT NOT RECEIVED)",
-        "GRIEVANCE (LOAN NOT TAKEN)",
-        "GRIEVANCE (SERVICE BEHAVIOUR COMPLAINT)",
-        "UNABLE TO PAY OTHER",
-        "DENIED TO PAY",
-        "PTP ON SPECIFIC DATE",
-        "PTP SOFT PROMISE",
-        "ALREADY PAID",
-        "DO NOT DISTURB REQUESTED",
-        DEFAULT_DISPOSITION,
-    }
-)
+
+def load_valid_disposition_codes() -> frozenset[str]:
+    """Load allowed disposition codes from csv/dispositions.csv (source of truth)."""
+    df = pd.read_csv("csv/dispositions.csv")
+    codes = {str(code).strip().upper() for code in df["Disposition Code"]}
+    codes.add(DEFAULT_DISPOSITION)
+    return frozenset(codes)
+
+
+VALID_DISPOSITION_CODES = load_valid_disposition_codes()
 
 
 def _customer_turn_count(transcript: List[Dict[str, Any]]) -> int:
@@ -133,9 +124,18 @@ def normalize_disposition_code(
             return SHORT_CALL_DISPOSITION
         return DEFAULT_DISPOSITION
 
-    normalized = raw.upper().replace("GREVIENCE", "GRIEVANCE")
+    normalized = raw.upper().replace("_", " ")
     if normalized in VALID_DISPOSITION_CODES:
         return normalized
+
+    # Accept either GREVIENCE or GRIEVANCE spelling from model output.
+    alt = (
+        normalized.replace("GRIEVANCE", "GREVIENCE")
+        if "GRIEVANCE" in normalized
+        else normalized.replace("GREVIENCE", "GRIEVANCE")
+    )
+    if alt in VALID_DISPOSITION_CODES:
+        return alt
 
     loguru.logger.warning(f"Unknown disposition '{raw}', using {DEFAULT_DISPOSITION}")
     return DEFAULT_DISPOSITION
@@ -146,14 +146,14 @@ def _compact_classifier_prompt() -> str:
     return f"""
 You classify loan collection call transcripts. Return ONE JSON object only (no markdown, no extra text).
 
-Schema:
+Schema (key_points must contain 0 to 3 strings only):
 {{"Disposition_code":"<code>","confidence":0.0,"explanation":"<max 25 words>","key_points":["<max 12 words>"]}}
 
 Valid Disposition_code values (exact match):
 {codes}
 
 Rules: pick the best match from evidence; never use null; if unsure use {DEFAULT_DISPOSITION}.
-Keep explanation and key_points very short so the JSON fits in under 400 tokens.
+Return at most 3 key_points. Keep explanation and key_points very short so the JSON fits in under 400 tokens.
 """
 
 
@@ -216,6 +216,70 @@ def _message_content_to_text(content: Any) -> str:
     return str(content).strip()
 
 
+def _all_response_text(response: Any) -> str:
+    """Collect visible and reasoning text from a chat model response."""
+    chunks: list[str] = []
+    for attr in ("content", "text"):
+        chunks.append(_message_content_to_text(getattr(response, attr, None)))
+    kwargs = getattr(response, "additional_kwargs", None) or {}
+    for key in ("content", "reasoning_content", "reasoning"):
+        chunks.append(_message_content_to_text(kwargs.get(key)))
+    return "\n".join(part for part in chunks if part)
+
+
+def _sanitize_disposition_payload(data: Any) -> dict:
+    """Coerce model JSON into something DispositionResult accepts."""
+    if not isinstance(data, dict):
+        raise ValueError("expected JSON object")
+
+    code = data.get("Disposition_code") or data.get("disposition_code")
+    if not code:
+        raise ValueError("missing Disposition_code")
+
+    key_points = data.get("key_points") or []
+    if not isinstance(key_points, list):
+        key_points = [str(key_points)]
+    key_points = [str(point).strip() for point in key_points if str(point).strip()][:3]
+
+    try:
+        confidence = float(data.get("confidence", 0.5))
+    except (TypeError, ValueError):
+        confidence = 0.5
+    confidence = min(1.0, max(0.0, confidence))
+
+    explanation = str(data.get("explanation") or "").strip()
+    if not explanation:
+        explanation = "Classification based on transcript evidence."
+
+    return {
+        "Disposition_code": str(code).strip(),
+        "confidence": confidence,
+        "explanation": explanation[:500],
+        "key_points": key_points,
+    }
+
+
+def _parse_disposition_payload(
+    data: Any, transcript: List[Dict[str, Any]]
+) -> DispositionResult:
+    result = DispositionResult.model_validate(_sanitize_disposition_payload(data))
+    result.Disposition_code = normalize_disposition_code(
+        result.Disposition_code, transcript
+    )
+    return result
+
+
+def _extract_disposition_code_from_text(text: str) -> str | None:
+    match = re.search(
+        r'"Disposition_code"\s*:\s*"([^"]+)"',
+        text,
+        re.IGNORECASE,
+    )
+    if match:
+        return match.group(1).strip()
+    return None
+
+
 def _default_disposition_result(
     transcript: List[Dict[str, Any]], reason: str = ""
 ) -> DispositionResult:
@@ -267,7 +331,8 @@ async def _invoke_compact_fallback(transcript: List[Dict[str, Any]]) -> Disposit
     """Plain chat completion + JSON parse when structured output hits length limit."""
     loguru.logger.warning("Using compact JSON fallback for disposition")
     last_err: str | None = None
-    for cap in (DISPOSITION_COMPACT_MAX_TOKENS, 1024, 2048):
+    last_raw: str | None = None
+    for cap in (512, DISPOSITION_COMPACT_MAX_TOKENS, 2048):
         try:
             response = await model.bind(max_tokens=cap).ainvoke(
                 [
@@ -277,33 +342,35 @@ async def _invoke_compact_fallback(transcript: List[Dict[str, Any]]) -> Disposit
                     ),
                 ]
             )
-            raw = _message_content_to_text(
-                getattr(response, "content", None) or getattr(response, "text", None)
-            )
-            if not raw and getattr(response, "additional_kwargs", None):
-                raw = _message_content_to_text(
-                    response.additional_kwargs.get("content")
-                    or response.additional_kwargs.get("reasoning_content")
-                )
+            raw = _all_response_text(response)
             if not raw:
                 last_err = "empty model response"
                 loguru.logger.warning(
                     f"Compact fallback empty content at max_tokens={cap}, retrying"
                 )
                 continue
+            last_raw = raw
             data = _extract_json_object(raw)
-            result = DispositionResult.model_validate(data)
-            result.Disposition_code = normalize_disposition_code(
-                result.Disposition_code, transcript
-            )
-            return result
+            return _parse_disposition_payload(data, transcript)
         except LengthFinishReasonError:
             loguru.logger.warning(f"Compact fallback truncated at max_tokens={cap}, retrying")
             last_err = "truncated"
             continue
-        except (ValueError, json.JSONDecodeError) as e:
+        except (ValueError, json.JSONDecodeError, ValidationError) as e:
             last_err = str(e)
             loguru.logger.warning(f"Compact fallback parse failed at max_tokens={cap}: {e}")
+            if last_raw:
+                code = _extract_disposition_code_from_text(last_raw)
+                if code:
+                    loguru.logger.warning(
+                        f"Salvaging disposition code from partial JSON: {code!r}"
+                    )
+                    return DispositionResult(
+                        Disposition_code=normalize_disposition_code(code, transcript),
+                        confidence=0.5,
+                        explanation="Classification from partial model JSON.",
+                        key_points=[],
+                    )
             continue
 
     # Last resort: ask for disposition code only (no JSON)
@@ -322,9 +389,7 @@ async def _invoke_compact_fallback(transcript: List[Dict[str, Any]]) -> Disposit
                 ),
             ]
         )
-        text = _message_content_to_text(
-            getattr(response, "content", None) or getattr(response, "text", None)
-        ).upper()
+        text = _all_response_text(response).upper()
         for code in sorted(VALID_DISPOSITION_CODES, key=len, reverse=True):
             if code.upper() in text:
                 return DispositionResult(
@@ -347,10 +412,14 @@ async def _classify_with_retries(messages: list, transcript: List[Dict[str, Any]
             return await _invoke_disposition(messages, max_tokens)
         except LengthFinishReasonError as e:
             completion_tokens, prompt_tokens = _usage_from_length_error(e)
-            if _retry_exhausted(max_tokens, completion_tokens):
+            hit_completion_cap = (
+                completion_tokens is not None
+                and completion_tokens >= max_tokens - 32
+            )
+            if hit_completion_cap or _retry_exhausted(max_tokens, completion_tokens):
                 loguru.logger.warning(
-                    f"max_tokens={max_tokens} but completion_tokens={completion_tokens}; "
-                    "server cap detected, switching to compact fallback"
+                    f"Completion capped at {completion_tokens} tokens "
+                    f"(requested max_tokens={max_tokens}); switching to compact fallback"
                 )
                 compact = await _invoke_compact_fallback(transcript)
                 return {"parsed": compact, "raw": None}
@@ -596,8 +665,19 @@ iii. Key Points:
 # """
 # Disposition classifier agent is a agent that classifies the disposition of the transcript
 @router.post("/disposition")
-async def get_disposition(transcript: List[Dict[str, Any]]) -> DispositionResult:
+async def get_disposition(transcript: Any = Body(...)) -> DispositionResult:
     global total_tokens
+
+    transcript = normalize_transcript(transcript)
+    if not transcript:
+        loguru.logger.warning("Empty transcript after normalization")
+        return DispositionResult(
+            Disposition_code=SHORT_CALL_DISPOSITION,
+            confidence=0.0,
+            explanation="No transcript content to classify.",
+            summary="summary of the transcript",
+            key_points=[],
+        )
 
     # user_turns = len([msg for msg in transcript if msg['role'] == 'user'])
     

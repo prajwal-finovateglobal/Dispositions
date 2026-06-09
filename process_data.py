@@ -22,39 +22,10 @@ def _sanitize_for_csv(s: Any) -> str:
 
 
 def normalize_to_list_of_dicts(data: Any) -> List[Dict[str, Any]]:
-    """
-    Ensures the data is in the form List[Dict[str, Any]].
-    If already in correct format, returns as-is.
-    If string, tries to parse it.
-    """
-    # If already a list of dicts, return as-is
-    if isinstance(data, list) and all(isinstance(item, dict) for item in data):
-        return data
-    
-    # If it's a string, try to parse it
-    if isinstance(data, str):
-        try:
-            # Try JSON parsing first (more lenient with JSON format)
-            parsed = json.loads(data)
-        except (json.JSONDecodeError, ValueError):
-            try:
-                # Fall back to ast.literal_eval for Python literals
-                parsed = ast.literal_eval(data)
-            except (ValueError, SyntaxError):
-                # If both fail, return empty list
-                print(f"Warning: Could not parse transcript string, using empty list")
-                return []
-        
-        # Validate parsed result is List[Dict[str, Any]]
-        if isinstance(parsed, list) and all(isinstance(item, dict) for item in parsed):
-            return parsed
-        else:
-            print(f"Warning: Parsed data is not List[Dict[str, Any]], got {type(parsed)}, using empty list")
-            return []
-    
-    # If it's already a list but not of dicts, or other type, return empty list
-    print(f"Warning: Data is not List[Dict[str, Any]], got {type(data)}, using empty list")
-    return []
+    """Delegate to shared transcript normalizer (handles turns/chat wrappers)."""
+    from transcript_utils import normalize_transcript
+
+    return normalize_transcript(data)
 
 
 
@@ -95,9 +66,10 @@ select
    icl.recording as recording,
    icl.fincode as uid
 from ivo_call_log icl
-where icl.campaign_id in (222)
+where icl.campaign_id in (231)
 and icl.recording is not null;
-''')
+'''
+)
 #221 still pending
 
 
