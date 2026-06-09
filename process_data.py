@@ -58,6 +58,8 @@ loguru.logger.info(f"query_sql function loaded")
 
 
 data =query_sql('''
+
+
 select 
    icl.transcript as chat,
    icl.contact_to as contact_to,
@@ -65,9 +67,19 @@ select
    icl.fincode as direction,
    icl.recording as recording,
    icl.fincode as uid
+   --icl.customer_id,
+   --count(icl.customer_id )
 from ivo_call_log icl
-where icl.campaign_id in (231)
-and icl.recording is not null;
+where icl.campaign_id   in (229,222,227,215)
+and icl.customer_id  in (
+	select iccd.customer_id
+	from ivo_campaign_call_data iccd 
+	where iccd.status = 'completed_connected'
+	and iccd.campaign_id  in ( 229,222,227,215)
+)
+and icl.call_status = 'Connected'
+limit 6000
+offset 6000
 '''
 )
 #221 still pending
